@@ -402,7 +402,7 @@ function buildComprehensiveParagraphs(item: any, source: SourceConfig, cleanTitl
 async function getFullArticleContent(item: any, source: SourceConfig, cleanTitle: string): Promise<string[]> {
   const scraped = await scrapeFullArticle(item.link);
   if (scraped.length >= 3) {
-    return scraped.slice(0, 15); // Return full live paragraphs directly from newspaper site
+    return scraped; // Return ALL live paragraphs without any artificial limit
   }
 
   return buildComprehensiveParagraphs(item, source, cleanTitle);

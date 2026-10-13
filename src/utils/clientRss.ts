@@ -81,14 +81,13 @@ const DYNAMIC_IMAGES = [
   'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80'
 ];
 
-// Build 100% complete, rich multi-paragraph news text readable entirely on Deshbarta
 function buildRichClientParagraphs(rawTitle: string, rawDesc: string, sourcePublisher: string): string[] {
   const cleanTitleStr = cleanText(rawTitle);
   const cleanDescStr = cleanText(rawDesc);
 
   const p1 = cleanDescStr && cleanDescStr.length > 30
     ? cleanDescStr
-    : `${cleanTitleStr}—এ বিষয়ে সম্প্রতি এক বিস্তৃত সংবাদ প্রকাশিত হয়েছে। ঘটনার গভীরতা বিবেচনা করে প্রাপ্ত সর্বশেষ তথ্য অনুযায়ী দেশবার্তা নিউজ ডেস্ক বিস্তারিত তথ্য তুলে ধরছে।`;
+    : `${cleanTitleStr}—এ বিষয়ে সম্প্রতি এক বিস্তৃত সংবাদ প্রকাশিত হয়েছে। ঘটনার গভীরতা বিবেচনা করে প্রাপ্ত সর্বশেষ তথ্য অনুযায়ী দেশবার্তা নিউজ ডেস্ক বিস্তারিত বিবরণ নিচে তুলে ধরছে।`;
 
   const p2 = `${sourcePublisher}-এর তথ্য ও লাইভ বুলেটিন অনুযায়ী, এই ঘটনাটি সাম্প্রতিক সময়ের রাজনীতি, অর্থনীতি ও সামাজিক প্রেক্ষাপটে অত্যন্ত গুরুত্বপূর্ণ মোড় সৃষ্টি করেছে। দেশের সচেতন সমাজ ও বিশ্লেষকমহল বিষয়টিকে নিবিড়ভাবে পর্যবেক্ষণ করছেন।`;
 
@@ -96,7 +95,7 @@ function buildRichClientParagraphs(rawTitle: string, rawDesc: string, sourcePubl
 
   const p4 = `প্রশাসন, আইন-শৃঙ্খলা রক্ষাকারী বাহিনী এবং সংশ্লিষ্ট দপ্তরের জ্যেষ্ঠ কর্মকর্তারা জানিয়েছেন, জনস্বার্থ ও সার্বিক স্থিতিশীলতা বজায় রাখতে ইতোমধ্যেই সতর্কতামূলক ব্যবস্থা গ্রহণ করা হয়েছে। ঘটনার পেছনের কারণ ও ভবিষ্যৎ প্রভাব খতিয়ে দেখতে বিশেষ পর্যবেক্ষণ টিম কাজ করছে।`;
 
-  const p5 = `এ বিষয়ে বার্তা সংস্থাগুলোর প্রতিবেদনে বলা হয়েছে, আন্তর্জাতিক পর্যায় এবং জাতীয় অর্থনীতিতেও এর প্রত্যক্ষ বা পরোক্ষ প্রভাব পরিলক্ষিত হতে পারে। তাই উদ্ভূত পরিস্থিতি বিবেচনায় রেখে প্রয়োজনীয় ব্যবস্থা গ্রহণের তাগিদ দেওয়া হয়েছে।`;
+  const p5 = `এ বিষয়ে বার্তা সংস্থাগুলোর প্রতিবেদনে বলা হয়েছে, আন্তর্জাতিক পর্যায় এবং জাতীয় অর্থনীতিতেও এর প্রত্যক্ষ বা পরোক্ষ প্রভাব পরিলক্ষিত হতে পারে। তাই উদ্ভূত পরিস্থিতি বিবেচনায় রেখে প্রয়োজনীয় ব্যবস্থা গ্রহণের তাগিদ দেওয়া হয়েছে।`;
 
   const p6 = `ঘটনাস্থল থেকে প্রাপ্ত সর্বশেষ তথ্যানুযায়ী, স্থানীয় জনগণ ও সংশ্লিষ্ট ব্যক্তিদের মধ্যে এই বিষয়ে ব্যাপক প্রতিক্রিয়া দেখা গেছে। সকলেই বিষয়টির ইতিবাচক ও দীর্ঘস্থায়ী সমাধান প্রত্যাশা করছেন।`;
 
@@ -105,7 +104,22 @@ function buildRichClientParagraphs(rawTitle: string, rawDesc: string, sourcePubl
   return [p1, p2, p3, p4, p5, p6, p7];
 }
 
-// 1. Primary Method: Fetch via rss2json API (Fastest and no CORS issues)
+// Extract ALL available paragraphs from RSS HTML without artificial limits
+function extractAllParagraphsFromRssItem(item: any, rawTitle: string, sourcePublisher: string): string[] {
+  const rawContent = item.content || item['content:encoded'] || item.description || '';
+  const blocks = rawContent
+    .split(/<\/p>|<br\s*\/?>|\n\n/)
+    .map((str: string) => cleanText(str.replace(/<[^>]+>/g, '')))
+    .filter((str: string) => str.length > 25 && !str.includes('কপিরাইট') && !str.includes('সাইন ইন') && !str.includes('বিজ্ঞাপন'));
+
+  if (blocks.length >= 2) {
+    return blocks; // Return ALL paragraphs (no limit: handles 10, 20, 50, 100 paragraphs!)
+  }
+
+  return buildRichClientParagraphs(rawTitle, cleanText(rawContent), sourcePublisher);
+}
+
+// 1. Primary Method: Fetch via rss2json API
 async function fetchViaRss2Json(source: RssSource): Promise<Article[]> {
   try {
     const targetUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(source.feedUrl)}`;
@@ -130,7 +144,8 @@ async function fetchViaRss2Json(source: RssSource): Promise<Article[]> {
         imgUrl = DYNAMIC_IMAGES[index % DYNAMIC_IMAGES.length];
       }
 
-      const richParagraphs = buildRichClientParagraphs(rawTitle, rawDesc, source.publisher);
+      const link = item.link || item.guid || '';
+      const richParagraphs = extractAllParagraphsFromRssItem(item, rawTitle, source.publisher);
 
       return {
         id: `rss2json-${source.publisherName}-${index}-${Date.now()}`,
@@ -150,7 +165,7 @@ async function fetchViaRss2Json(source: RssSource): Promise<Article[]> {
         isLead: index === 0 && source.publisherName === 'prothomalo',
         isTrending: index < 4,
         tags: [source.publisher, source.category, 'লাইভ সংবাদ'],
-        sourceUrl: '', // Kept empty so no redirection prompt is needed
+        sourceUrl: link,
       };
     }).filter((a: Article) => a.title && a.title.length > 5);
   } catch (err) {
@@ -199,6 +214,8 @@ function parseRssXml(xmlStr: string, source: RssSource): Article[] {
       let rawDesc = cleanText(item.querySelector('description')?.textContent || '');
       rawDesc = rawDesc.replace(/<[^>]+>/g, '').trim();
 
+      const link = item.querySelector('link')?.textContent || '';
+
       if (!rawTitle || rawTitle.length < 5) return;
 
       let imgUrl = source.defaultImage;
@@ -232,7 +249,7 @@ function parseRssXml(xmlStr: string, source: RssSource): Article[] {
         isLead: index === 0 && source.publisherName === 'prothomalo',
         isTrending: index < 3,
         tags: [source.publisher, source.category, 'লাইভ খবর'],
-        sourceUrl: '', // Native in-app reading only
+        sourceUrl: link,
       });
     });
   } catch (e) {

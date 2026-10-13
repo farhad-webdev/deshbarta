@@ -303,7 +303,7 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({
                     <span>সূত্র: {article.publisherBengali || 'দেশবার্তা বিশেষ বার্তা'}</span>
                   </h3>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    এই সম্পূর্ণ প্রতিবেদনটি দেশবার্তা পোর্টালেই সরাসরি পাঠযোগ্য। অন্য কোনো ওয়েবসাইটে যাওয়ার প্রয়োজন নেই।
+                    এই সম্পূর্ণ প্রতিবেদনটি (সকল প্যারাগ্রাফ সহ) দেশবার্তা পোর্টালেই সরাসরি পাঠযোগ্য। অন্য কোনো ওয়েবসাইটে যাওয়ার প্রয়োজন নেই।
                   </p>
                 </div>
 
@@ -316,6 +316,22 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({
                   <span>সংবাদটি অডিওতে শুনুন</span>
                 </button>
               </div>
+
+              {/* Optional external portal link if user explicitly wants to visit */}
+              {article.sourceUrl && article.sourceUrl.startsWith('http') && (
+                <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                  <span>নিউজ সোর্স লিঙ্ক: {article.publisherBengali || article.publisherName}</span>
+                  <a
+                    href={article.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-red-400 hover:text-red-300 font-medium hover:underline inline-flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>(ঐচ্ছিক) মূল পোর্টাল ভিজিট করুন</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              )}
             </div>
           </div>
 
