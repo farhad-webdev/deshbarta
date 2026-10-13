@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Sun, 
   Clock, 
@@ -11,7 +11,8 @@ import {
   X,
   Calendar,
   User as UserIcon,
-  LogOut
+  LogOut,
+  Briefcase
 } from 'lucide-react';
 import { BREAKING_TICKER_ITEMS } from '../data/mockNews';
 import { useAuth } from '../context/AuthContext';
@@ -161,8 +162,18 @@ export const Header: React.FC<HeaderProps> = ({
     return () => clearInterval(interval);
   }, [isTickerPaused, activeTickerList.length]);
 
+  const navScrollRef = useRef<HTMLUListElement>(null);
+
+  const scrollNav = (direction: 'left' | 'right') => {
+    if (navScrollRef.current) {
+      const amount = direction === 'left' ? -220 : 220;
+      navScrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
+
   const navCategories = [
     { id: 'all', label: 'সব খবর' },
+    { id: 'jobs', label: 'চাকরি', isHot: true },
     { id: 'top', label: 'শীর্ষ সংবাদ' },
     { id: 'politics', label: 'রাজনীতি' },
     { id: 'economy', label: 'অর্থনীতি' },
@@ -398,30 +409,61 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* 4. Primary Category Navigation Bar */}
-      <nav className="border-t border-slate-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ul className="flex items-center gap-1 overflow-x-auto py-1 scrollbar-none font-semibold text-xs sm:text-sm text-slate-700 whitespace-nowrap">
+      <nav className="border-t border-slate-200 bg-white shadow-xs relative">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 relative flex items-center">
+          {/* Scroll Left Button */}
+          <button
+            type="button"
+            onClick={() => scrollNav('left')}
+            className="hidden md:flex items-center justify-center w-7 h-7 bg-white hover:bg-slate-100 border border-slate-200 rounded-full shadow-xs text-slate-600 hover:text-red-600 z-10 shrink-0 cursor-pointer mr-1"
+            title="পূর্ববর্তী বিভাগ"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          <ul
+            ref={navScrollRef}
+            className="flex items-center gap-1.5 overflow-x-auto py-2 px-1 scrollbar-none font-semibold text-xs sm:text-sm text-slate-700 whitespace-nowrap scroll-smooth flex-1"
+          >
             {navCategories.map((cat) => {
               const isActive = activeCategory === cat.id;
               return (
-                <li key={cat.id}>
+                <li key={cat.id} className="shrink-0">
                   <button
                     type="button"
                     onClick={() => {
                       setActiveCategory(cat.id);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                    className={`h-9 px-4 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 font-bold text-xs sm:text-sm shadow-2xs ${
                       isActive
-                        ? 'bg-[#dc2626] text-white font-bold shadow-xs'
-                        : 'text-slate-700 hover:text-red-600 hover:bg-slate-50'
+                        ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-md shadow-red-600/30 scale-105'
+                        : cat.isHot
+                        ? 'text-red-700 bg-red-50 hover:bg-red-100 border border-red-300/80 font-extrabold'
+                        : 'text-slate-700 hover:text-red-600 hover:bg-slate-100/80'
                     }`}
                   >
-                    {cat.label}
+                    {cat.isHot && (
+                      <div className={`w-5 h-5 rounded-lg flex items-center justify-center ${isActive ? 'bg-white/20 text-white' : 'bg-red-100 text-red-600'}`}>
+                        <Briefcase className="w-3.5 h-3.5 shrink-0" />
+                      </div>
+                    )}
+                    <span>{cat.label}</span>
                   </button>
                 </li>
               );
             })}
           </ul>
+
+          {/* Scroll Right Button */}
+          <button
+            type="button"
+            onClick={() => scrollNav('right')}
+            className="hidden md:flex items-center justify-center w-7 h-7 bg-white hover:bg-slate-100 border border-slate-200 rounded-full shadow-xs text-slate-600 hover:text-red-600 z-10 shrink-0 cursor-pointer ml-1"
+            title="পরবর্তী বিভাগ"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       </nav>
     </header>

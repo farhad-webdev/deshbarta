@@ -16,6 +16,7 @@ import { SavedArticlesDrawer } from './components/SavedArticlesDrawer';
 import { WeatherModal } from './components/WeatherModal';
 import { PrayerTimesModal } from './components/PrayerTimesModal';
 import { InfoPageModal, InfoPageType } from './components/InfoPageModal';
+import { JobsPage } from './components/JobsPage';
 import { INITIAL_ARTICLES, INITIAL_POLL, INITIAL_COMMENTS } from './data/mockNews';
 import { Article, Poll, Comment } from './types';
 import { cleanText } from './utils/textUtils';
@@ -302,6 +303,7 @@ export default function App() {
 
   const getCategoryBengaliLabel = (cat: string) => {
     const map: Record<string, string> = {
+      jobs: 'চাকরি',
       top: 'শীর্ষ সংবাদ',
       politics: 'রাজনীতি',
       economy: 'অর্থনীতি',
@@ -336,6 +338,7 @@ export default function App() {
           if (!isTop) return false;
         } else {
           const catMap: Record<string, string[]> = {
+            jobs: ['jobs', 'job', 'চাকরি', 'নিয়োগ', 'নিয়োদ', 'সার্কুলার', 'circular', 'বিজ্ঞপ্তি', 'কর্মসংস্থান', 'আবেদন', 'পদ', 'পাবলিক সার্ভিস', 'বিসিএস', 'ব্যাংক', 'শিক্ষক', 'সরকারি', 'বেসরকারি', 'প্রতিরক্ষা'],
             politics: ['politics', 'রাজনীতি', 'দল', 'মন্ত্রী', 'নির্বাচন', 'সরকার', 'উপদেষ্টা', 'সংসদ', 'রাজনৈতিক', 'আইন', 'প্রশাসন', 'আন্দোলন'],
             economy: ['economy', 'অর্থনীতি', 'ব্যাংক', 'ব্যবসা', 'বাণিজ্য', 'বাজেট', 'মুদ্রা', 'দাম', 'টাকা', 'শেয়ার', 'ঋণ', 'জ্বালানি', 'তেল', 'কর', 'মূল্যস্ফীতি'],
             national: ['national', 'saradesh', 'bangladesh', 'সারাদেশ', 'জাতীয়', 'জাতীয়', 'জেলা', 'উপজেলা', 'বরিশাল', 'সিলেট', 'চট্টগ্রাম', 'খুলনা', 'রাজশাহী', 'রংপুর', 'ময়মনসিংহ', 'ঢাকা'],
@@ -466,6 +469,22 @@ export default function App() {
             poll={poll}
             onVotePoll={handleVotePoll}
           />
+        ) : activeCategory === 'jobs' ? (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <JobsPage
+              articles={articles}
+              onSelectArticle={(art) => {
+                setSelectedArticle(art);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onGoHome={() => {
+                setActiveCategory('all');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              savedArticleIds={savedArticleIds}
+              onToggleSave={handleToggleSave}
+            />
+          </div>
         ) : (
           /* View 2: Homepage Layout */
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">

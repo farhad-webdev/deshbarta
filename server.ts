@@ -160,6 +160,46 @@ const NEWS_SOURCES: SourceConfig[] = [
     feedUrl: 'https://news.google.com/rss/search?q=site:prothomalo.com+OR+site:kalerkantho.com+%E0%A6%AE%E0%A6%AA%E0%A6%B0%E0%A6%BE%E0%A6%A0&hl=bn&gl=BD&ceid=BD:bn',
     defaultImage: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
     category: 'অপরাধ'
+  },
+  {
+    id: 'cat_jobs',
+    name: 'Job Circulars Feed',
+    bengaliName: 'চাকরি ও নিয়োগ',
+    color: '#dc2626',
+    domain: 'prothomalo.com',
+    feedUrl: 'https://news.google.com/rss/search?q=site:prothomalo.com+OR+site:kalerkantho.com+OR+site:kalbela.com+%E0%A6%A3%E0%A6%BF%E0%A6%AF%E0%A6%BC%E0%A7%8B%E0%A6%99+%E0%A6%9A%E0%A6%BE%E0%A6%95%E0%A6%B0%E0%A6%BF+%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%81%E0%A6%B2%E0%A6%BE%E0%A6%B0&hl=bn&gl=BD&ceid=BD:bn',
+    defaultImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+    category: 'চাকরি'
+  },
+  {
+    id: 'cat_jobs_govt',
+    name: 'Govt Jobs Feed',
+    bengaliName: 'সরকারি চাকরি',
+    color: '#dc2626',
+    domain: 'kalerkantho.com',
+    feedUrl: 'https://news.google.com/rss/search?q=%E0%A6%B8%E0%A6%B0%E0%A6%95%E0%A6%BE%E0%A6%B0%E0%A6%BF+%E0%A6%9A%E0%A6%BE%E0%A6%95%E0%A6%B0%E0%A6%BF+%E0%A6%A3%E0%A6%BF%E0%A6%AF%E0%A6%BC%E0%A7%8B%E0%A6%99+%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%81%E0%A6%B2%E0%A6%BE%E0%A6%B0&hl=bn&gl=BD&ceid=BD:bn',
+    defaultImage: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80',
+    category: 'চাকরি'
+  },
+  {
+    id: 'cat_jobs_bank',
+    name: 'Bank Jobs Feed',
+    bengaliName: 'ব্যাংক নিয়োগ',
+    color: '#2563eb',
+    domain: 'kalbela.com',
+    feedUrl: 'https://news.google.com/rss/search?q=%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%82%E0%A6%95+%E0%A6%A3%E0%A6%BF%E0%A6%AF%E0%A6%BC%E0%A7%8B%E0%A6%99+%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%81%E0%A6%B2%E0%A6%BE%E0%A6%B0&hl=bn&gl=BD&ceid=BD:bn',
+    defaultImage: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80',
+    category: 'চাকরি'
+  },
+  {
+    id: 'cat_jobs_teacher',
+    name: 'Teacher & Edu Jobs Feed',
+    bengaliName: 'শিক্ষক ও শিক্ষা নিয়োগ',
+    color: '#16a34a',
+    domain: 'prothomalo.com',
+    feedUrl: 'https://news.google.com/rss/search?q=%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A6%B7%E0%A6%95+%E0%A6%A3%E0%A6%BF%E0%A6%AF%E0%A6%BC%E0%A7%8B%E0%A6%99+%E0%A6%9A%E0%A6%BE%E0%A6%95%E0%A6%B0%E0%A6%BF+%E0%A6%B8%E0%A6%BE%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%81%E0%A6%B2%E0%A6%BE%E0%A6%B0&hl=bn&gl=BD&ceid=BD:bn',
+    defaultImage: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80',
+    category: 'চাকরি'
   }
 ];
 
@@ -184,12 +224,18 @@ function categorizeArticle(title: string, excerpt: string, itemCategories: strin
   const text = `${title} ${excerpt} ${(itemCategories || []).join(' ')}`.toLowerCase();
 
   // Explicit Source Category overrides if dedicated feed
+  if (source.id.startsWith('cat_jobs')) return { categorySlug: 'jobs', category: 'চাকরি', categoryColor: '#dc2626' };
   if (source.id === 'cat_politics') return { categorySlug: 'politics', category: 'রাজনীতি', categoryColor: '#dc2626' };
   if (source.id === 'cat_economy') return { categorySlug: 'economy', category: 'অর্থনীতি', categoryColor: '#059669' };
   if (source.id === 'cat_sports') return { categorySlug: 'sports', category: 'খেলাধুলা', categoryColor: '#16a34a' };
   if (source.id === 'cat_tech') return { categorySlug: 'technology', category: 'প্রযুক্তি', categoryColor: '#7c3aed' };
   if (source.id === 'cat_health') return { categorySlug: 'health', category: 'স্বাস্থ্য', categoryColor: '#0891b2' };
   if (source.id === 'cat_crime') return { categorySlug: 'crime', category: 'অপরাধ', categoryColor: '#b91c1c' };
+
+  // Keyword categorization
+  if (/চাকরি|নিয়োগ|নিয়োগ|সার্কুলার|circular|কর্মসংস্থান|বিসিএস|ব্যাংক নিয়োগ|শিক্ষক নিয়োগ|বিজ্ঞপ্তি|আবেদন|জব/i.test(text)) {
+    return { categorySlug: 'jobs', category: 'চাকরি', categoryColor: '#dc2626' };
+  }
 
   // Keyword categorization
   if (/রাজনীতি|নির্বাচন|ভোট|আওয়ামী|বিএনপি|জামায়াত|সরকার|উপদেষ্টা|মন্ত্রী|প্রধান বিচার|প্রধানমন্ত্রী|সংসদ|উপনির্বাচন|রাজনৈতিক|নির্বাচন কমিশন|প্রশাসন|আন্দোলন|মিছিল|হরতাল|আইন/i.test(text)) {
@@ -642,7 +688,7 @@ app.post('/api/ai/ask', async (req, res) => {
     if (aiClient) {
       try {
         const response = await aiClient.models.generateContent({
-          model: 'gemini-3.8-flash',
+          model: 'gemini-2.5-flash',
           contents: `ওয়েবসাইটের সকল লাইভ খবরের ডেটাবেস:\n${newsContext}\n\nব্যবহারকারীর প্রশ্ন: ${question}`,
           config: {
             systemInstruction: `আপনি 'দেশবার্তা এআই সংবাদ সহকারী' (Deshbarta AI News Assistant)। আপনার মূল কাজ হলো দেশবার্তা পোটালের সকল সংবাদ নিবিড়ভাবে রিসার্চ করে ব্যবহারকারীর প্রশ্নের নিখুঁত, নিরপেক্ষ ও বস্তুনিষ্ঠ উত্তর দেওয়া।
@@ -709,10 +755,19 @@ app.post('/api/ai/ask', async (req, res) => {
   }
 });
 
+// Global Error Handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Express App Error:', err);
+  if (!res.headersSent) {
+    res.status(500).json({ error: err?.message || 'Internal Server Error' });
+  }
+});
+
 async function startServer() {
+  const isProd = process.env.NODE_ENV === 'production';
   const distPath = path.join(process.cwd(), 'dist');
 
-  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL && !fs.existsSync(distPath)) {
+  if (!isProd) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -734,7 +789,9 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`Deshbarta Automated News Server running on http://localhost:${PORT}`);
     // Initial fetch on server startup
-    fetchLiveNews();
+    fetchLiveNews().catch((err) => {
+      console.warn('Initial news fetch warning:', err?.message || err);
+    });
     // Auto-sync in background every 30 seconds for real-time fresh news
     setInterval(() => {
       fetchLiveNews().catch(() => {});

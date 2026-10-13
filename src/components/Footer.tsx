@@ -75,6 +75,16 @@ export const Footer: React.FC<FooterProps> = ({ onCategoryClick, onGoHome, onOpe
               <li>
                 <button
                   type="button"
+                  onClick={() => onCategoryClick('jobs')}
+                  className="hover:text-red-400 font-bold text-red-400 transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <span>চাকরি ও ক্যারিয়ার</span>
+                  <span className="bg-red-600 text-white text-[9px] px-1 rounded font-black">নিয়োগ</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
                   onClick={() => onCategoryClick('politics')}
                   className="hover:text-red-400 transition-colors cursor-pointer"
                 >
