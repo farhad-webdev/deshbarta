@@ -2,6 +2,8 @@ import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import Parser from 'rss-parser';
 import { GoogleGenAI } from '@google/genai';
+import path from 'path';
+import fs from 'fs';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -636,12 +638,25 @@ app.post('/api/ai/ask', async (req, res) => {
 });
 
 async function startServer() {
-  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  const distPath = path.join(process.cwd(), 'dist');
+
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL && !fs.existsSync(distPath)) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
+  } else if (fs.existsSync(distPath)) {
+    // Production Mode / Cloud Run / Node hosting
+    app.use(express.static(distPath));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api')) return next();
+      const indexPath = path.join(distPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        return res.sendFile(indexPath);
+      }
+      next();
+    });
   }
 
   app.listen(PORT, () => {
