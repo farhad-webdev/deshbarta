@@ -14,7 +14,7 @@ export const Footer: React.FC<FooterProps> = ({ onCategoryClick, onGoHome }) => 
   return (
     <footer className="bg-[#0b1120] text-slate-300 border-t border-slate-800">
       {/* Main Footer Container */}
-      <div className="max-w-7xl mx-auto px-4 py-12 sm:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10">
           {/* Column 1: Brand & Bio (2 cols wide on desktop) */}
           <div className="lg:col-span-2 space-y-4">
@@ -214,12 +214,19 @@ export const Footer: React.FC<FooterProps> = ({ onCategoryClick, onGoHome }) => 
 
       {/* Bottom Copyright Bar */}
       <div className="border-t border-slate-800/80 bg-[#070b14] py-4 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <div>
-            © ২০২৪ দেশবার্তা মিডিয়া লিমিটেড — সর্বস্বত্ব সংরক্ষিত
+            © ২০২৬ দেশ বার্তা — সর্ব্বস্বত্ব সংরক্ষিত
           </div>
           <div>
-            সম্পাদক ও প্রকাশক: মো. রফিকুল হাসান | ঢাকা, বাংলাদেশ থেকে প্রকাশিত
+            <a
+              href="http://farhadhossain.online/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-red-400 hover:underline transition-colors font-medium"
+            >
+              Development By Farhad Hossain
+            </a>
           </div>
           <button
             type="button"

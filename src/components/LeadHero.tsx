@@ -15,6 +15,8 @@ export const LeadHero: React.FC<LeadHeroProps> = ({
   isSaved,
   onToggleSave,
 }) => {
+  if (!article) return null;
+
   return (
     <article className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition-shadow group flex flex-col justify-between">
       {/* Top Media & Badges Container */}
@@ -57,6 +59,9 @@ export const LeadHero: React.FC<LeadHeroProps> = ({
             alt={article.title}
             className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500"
             loading="eager"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&w=1200&q=80';
+            }}
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
         </div>

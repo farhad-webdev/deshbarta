@@ -1,0 +1,97 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profile",
+      "description": "Registered user profile and authentication details",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 256 },
+        "photoURL": { "type": "string", "maxLength": 1024 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "bookmarks": {
+      "title": "Saved News Bookmark",
+      "description": "User saved news articles for offline reading or quick reference",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "articleId": { "type": "string", "maxLength": 256 },
+        "articleTitle": { "type": "string", "maxLength": 512 },
+        "articleImage": { "type": "string", "maxLength": 1024 },
+        "category": { "type": "string", "maxLength": 128 },
+        "publisher": { "type": "string", "maxLength": 128 },
+        "savedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "articleId", "articleTitle"]
+    },
+    "comments": {
+      "title": "Article Comment",
+      "description": "Reader comments on specific news articles",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "articleId": { "type": "string", "maxLength": 256 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "userName": { "type": "string", "maxLength": 128 },
+        "userPhoto": { "type": "string", "maxLength": 1024 },
+        "text": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "articleId", "userId", "text"]
+    },
+    "reactions": {
+      "title": "Article Reaction",
+      "description": "Likes and reactions on news articles",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "articleId": { "type": "string", "maxLength": 256 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["like", "love", "insightful", "sad"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "articleId", "userId", "type"]
+    },
+    "feedback": {
+      "title": "User Feedback",
+      "description": "User opinions and feature requests sent to Deshbarta",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "userName": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "message": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "message"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "#/entities/users",
+      "description": "Public/private user profile document indexed by UID"
+    },
+    "/users/{userId}/bookmarks/{bookmarkId}": {
+      "schema": "#/entities/bookmarks",
+      "description": "Private subcollection for user news bookmarks"
+    },
+    "/comments/{commentId}": {
+      "schema": "#/entities/comments",
+      "description": "Public comments stream for articles"
+    },
+    "/reactions/{reactionId}": {
+      "schema": "#/entities/reactions",
+      "description": "Article reactions and likes"
+    },
+    "/feedback/{feedbackId}": {
+      "schema": "#/entities/feedback",
+      "description": "User feedback messages submitted to the portal"
+    }
+  }
+}

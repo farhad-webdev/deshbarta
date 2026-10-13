@@ -83,31 +83,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
           </h3>
         </div>
 
-        <div className="divide-y divide-slate-100">
-          {mostReadArticles.map((item) => {
-            const fullArticle = articles.find((a) => a.id === item.id);
-            return (
-              <div
-                key={item.id}
-                onClick={() => fullArticle && onSelectArticle(fullArticle)}
-                className="p-3.5 hover:bg-slate-50 transition-colors cursor-pointer group flex items-start gap-3"
-              >
-                <span className="text-red-600 font-extrabold text-sm sm:text-base shrink-0 select-none">
-                  #{item.rank}
-                </span>
-                <div className="flex-1">
-                  <h4 className="text-xs sm:text-sm font-semibold text-slate-900 group-hover:text-red-600 transition-colors line-clamp-2 leading-snug">
-                    {item.title}
-                  </h4>
-                  <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-1 font-medium">
-                    <Clock className="w-3 h-3 text-slate-400" />
-                    <span>{item.time}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+
       </div>
 
       {/* 2. দেশবার্তা কৃত্রিম বুদ্ধিমত্তা (AI Assistant Promo Card) */}
@@ -121,7 +97,6 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
           </span>
           <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
             <span>এআই সংবাদ বিশ্লেষণ ও ফ্যাক্টচেক</span>
-            <Sparkles className="w-4 h-4 text-amber-400" />
           </h3>
           <p className="text-xs text-slate-300 leading-relaxed mb-4">
             যেকোনো সমসাময়িক আলোচিত সংবাদের দ্রুত নিরপেক্ষ সারসংক্ষেপ, তথ্যসূত্র যাচাই কিংবা প্রাসঙ্গিক প্রেক্ষাপট জানতে প্রশ্ন করুন আমাদের এআইকে।
@@ -135,7 +110,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
               className="w-full text-left bg-white/10 hover:bg-white/15 border border-white/10 px-3 py-2 rounded-lg text-xs text-slate-200 transition-colors flex items-center justify-between group cursor-pointer"
             >
               <span className="truncate">"আজকের জ্বালানি তেলের দামের আপডেট কী?"</span>
-              <span className="text-slate-400 group-hover:text-white transition-colors">↘</span>
+              <span className="text-slate-400 group-hover:text-white transition-colors">→</span>
             </button>
             <button
               type="button"
@@ -143,7 +118,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
               className="w-full text-left bg-white/10 hover:bg-white/15 border border-white/10 px-3 py-2 rounded-lg text-xs text-slate-200 transition-colors flex items-center justify-between group cursor-pointer"
             >
               <span className="truncate">"উপনির্বাচনের প্রধান প্রতিদ্বন্দ্বী দলগুলো কারা?"</span>
-              <span className="text-slate-400 group-hover:text-white transition-colors">↘</span>
+              <span className="text-slate-400 group-hover:text-white transition-colors">→</span>
             </button>
           </div>
 
@@ -153,7 +128,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
             onClick={() => onOpenAIAssistant()}
             className="w-full bg-linear-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-2.5 px-4 rounded-lg text-xs sm:text-sm transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>💬 এআই চ্যাট শুরু করুন</span>
+            <span>এআই চ্যাট শুরু করুন</span>
           </button>
         </div>
       </div>

@@ -2,16 +2,19 @@
 
 @layer base {
   :root {
-    --font-bangla: 'Hind Siliguri', system-ui, -apple-system, sans-serif;
+    --font-bangla: 'Anek Bangla', 'Noto Sans Bengali', 'Hind Siliguri', system-ui, -apple-system, sans-serif;
     --font-serif-bangla: 'Noto Serif Bengali', serif;
   }
 
   body {
     font-family: var(--font-bangla);
-    color: #1e293b;
+    color: #0f172a;
     background-color: #f8fafc;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern", "liga", "clig", "calt";
+    line-height: 1.5;
   }
 }
 

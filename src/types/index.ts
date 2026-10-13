@@ -22,6 +22,10 @@ export interface Article {
   mostReadRank?: number;
   readTime: string;
   audioDuration?: string;
+  publisherName?: string;
+  publisherBengali?: string;
+  sourceUrl?: string;
+  isLiveSynced?: boolean;
 }
 
 export interface Comment {
@@ -70,13 +74,28 @@ export interface PrayerTimeItem {
   isCurrent?: boolean;
 }
 
+export interface EPaperArticle {
+  id: string;
+  headline: string;
+  subTitle?: string;
+  author?: string;
+  category: string;
+  content: string[];
+  imageUrl?: string;
+  imageCaption?: string;
+  columnSpan?: number;
+}
+
 export interface EPaperPage {
   pageNumber: number;
   title: string;
+  categoryName: string;
   date: string;
+  editionName?: string;
   leadHeadline: string;
   subHeadlines: string[];
   previewUrl: string;
+  articles?: EPaperArticle[];
 }
 
 export interface ChatMessage {
