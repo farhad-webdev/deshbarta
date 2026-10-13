@@ -85,16 +85,7 @@ export default function App() {
     }
 
     if (fetchedList.length > 0) {
-      setArticles((prev) => {
-        const existingIds = new Set(prev.map((a) => a.id));
-        const newFetched = fetchedList.filter((a: Article) => !existingIds.has(a.id));
-        if (newFetched.length > 0 && isBackgroundAuto) {
-          setNewArticlesCount(newFetched.length);
-          setTimeout(() => setNewArticlesCount(0), 8000);
-        }
-        const staticArticles = prev.filter((a) => !a.isLiveSynced);
-        return [...fetchedList, ...staticArticles];
-      });
+      setArticles(fetchedList);
       setLiveCount(fetchedList.length);
       setLastSyncTime(syncTimeStr);
     }
@@ -128,10 +119,7 @@ export default function App() {
     }
 
     if (fetchedList.length > 0) {
-      setArticles((prev) => {
-        const staticArticles = prev.filter((a) => !a.isLiveSynced);
-        return [...fetchedList, ...staticArticles];
-      });
+      setArticles(fetchedList);
       setLiveCount(fetchedList.length);
       setLastSyncTime(syncTimeStr);
     }
