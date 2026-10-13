@@ -1,12 +1,14 @@
 import React from 'react';
 import { Facebook, Twitter, Youtube, Linkedin, Smartphone, ArrowUp } from 'lucide-react';
+import { InfoPageType } from './InfoPageModal';
 
 interface FooterProps {
   onCategoryClick: (categorySlug: string) => void;
   onGoHome: () => void;
+  onOpenInfoPage?: (pageType: InfoPageType) => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onCategoryClick, onGoHome }) => {
+export const Footer: React.FC<FooterProps> = ({ onCategoryClick, onGoHome, onOpenInfoPage }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -134,34 +136,58 @@ export const Footer: React.FC<FooterProps> = ({ onCategoryClick, onGoHome }) => 
             </h3>
             <ul className="space-y-2.5 text-xs text-slate-400">
               <li>
-                <a href="#about" className="hover:text-red-400 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => onOpenInfoPage?.('about')}
+                  className="hover:text-red-400 transition-colors cursor-pointer text-left"
+                >
                   আমাদের সম্পর্কে
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#advertisement" className="hover:text-red-400 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => onOpenInfoPage?.('advertisement')}
+                  className="hover:text-red-400 transition-colors cursor-pointer text-left"
+                >
                   বিজ্ঞাপন মূল্যতালিকা
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#privacy" className="hover:text-red-400 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => onOpenInfoPage?.('privacy')}
+                  className="hover:text-red-400 transition-colors cursor-pointer text-left"
+                >
                   গোপনীয়তা নীতি
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#terms" className="hover:text-red-400 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => onOpenInfoPage?.('terms')}
+                  className="hover:text-red-400 transition-colors cursor-pointer text-left"
+                >
                   ব্যবহারের শর্তাবলী
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#contact" className="hover:text-red-400 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => onOpenInfoPage?.('contact')}
+                  className="hover:text-red-400 transition-colors cursor-pointer text-left"
+                >
                   যোগাযোগ ও ঠিকানা
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#sitemap" className="hover:text-red-400 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => onOpenInfoPage?.('sitemap')}
+                  className="hover:text-red-400 transition-colors cursor-pointer text-left"
+                >
                   সাইটম্যাপ
-                </a>
+                </button>
               </li>
             </ul>
           </div>

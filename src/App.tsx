@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { RefreshCw } from 'lucide-react';
 import { Header } from './components/Header';
 import { LiveAutomationBar } from './components/LiveAutomationBar';
+import { NewsSkeletonLoader } from './components/NewsSkeletonLoader';
 import { LeadHero } from './components/LeadHero';
 import { TrendingSidebar } from './components/TrendingSidebar';
 import { NewsGrid } from './components/NewsGrid';
@@ -13,6 +15,7 @@ import { AudioBulletinPlayer } from './components/AudioBulletinPlayer';
 import { SavedArticlesDrawer } from './components/SavedArticlesDrawer';
 import { WeatherModal } from './components/WeatherModal';
 import { PrayerTimesModal } from './components/PrayerTimesModal';
+import { InfoPageModal, InfoPageType } from './components/InfoPageModal';
 import { INITIAL_ARTICLES, INITIAL_POLL, INITIAL_COMMENTS } from './data/mockNews';
 import { Article, Poll, Comment } from './types';
 import { cleanText } from './utils/textUtils';
@@ -56,6 +59,26 @@ export default function App() {
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
   const [aiInitialPrompt, setAiInitialPrompt] = useState<string | undefined>();
   const [isPlayingAudioBulletin, setIsPlayingAudioBulletin] = useState(false);
+  const [infoPageType, setInfoPageType] = useState<InfoPageType>(null);
+
+  // Parse URL pathname or hash for static pages (e.g. /terms, /privacy, /about, /contact)
+  useEffect(() => {
+    const checkUrlRoute = () => {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      const path = window.location.pathname.replace('/', '').toLowerCase();
+      const target = hash || path;
+      if (['terms', 'privacy', 'about', 'contact', 'advertisement', 'sitemap'].includes(target)) {
+        setInfoPageType(target as InfoPageType);
+      }
+    };
+    checkUrlRoute();
+    window.addEventListener('hashchange', checkUrlRoute);
+    window.addEventListener('popstate', checkUrlRoute);
+    return () => {
+      window.removeEventListener('hashchange', checkUrlRoute);
+      window.removeEventListener('popstate', checkUrlRoute);
+    };
+  }, []);
 
   // Load live news with server endpoint + client-side RSS fallback for Vercel/Static hosting
   const fetchLiveNews = async (isBackgroundAuto = false) => {
@@ -445,7 +468,7 @@ export default function App() {
           />
         ) : (
           /* View 2: Homepage Layout */
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
             {/* Search, Category, or Source Filter indicator */}
             {(searchQuery || selectedSource !== 'all' || activeCategory !== 'all') && (
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-amber-900 flex items-center justify-between shadow-2xs">
@@ -472,18 +495,8 @@ export default function App() {
               </div>
             )}
 
-            {/* Loading state when fetching live news */}
-            {articles.length === 0 && (
-              <div className="bg-white rounded-xl border border-slate-200 p-12 text-center shadow-2xs my-8 space-y-4">
-                <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto" />
-                <h3 className="font-bold text-lg text-slate-800">
-                  অটোমেটেড লাইভ নিউজ লোড করা হচ্ছে...
-                </h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  প্রথম আলো, বিবিসি বাংলা, কালের কণ্ঠ ও কালবেলা থেকে সর্বশেষ লাইভ খবর সংগ্রহ করা হচ্ছে। অনুগ্রহ করে এক মুহূর্ত অপেক্ষা করুন।
-                </p>
-              </div>
-            )}
+            {/* Skeleton Loading state when fetching live news */}
+            {articles.length === 0 && <NewsSkeletonLoader />}
 
             {/* Top Section: Lead Story (Hero) & Trending Today Sidebar */}
             {!searchQuery && selectedSource === 'all' && activeCategory === 'all' && leadArticle && (
@@ -560,6 +573,18 @@ export default function App() {
           setSelectedSource('all');
           setSearchQuery('');
           window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onOpenInfoPage={(page) => setInfoPageType(page)}
+      />
+
+      {/* Static Info Page Modal (Terms, Privacy, About, Contact, Ads, Sitemap) */}
+      <InfoPageModal
+        pageType={infoPageType}
+        onClose={() => {
+          setInfoPageType(null);
+          if (window.location.hash || window.location.pathname !== '/') {
+            window.history.pushState('', document.title, window.location.pathname.replace(/\/terms|\/privacy|\/about|\/contact|\/advertisement|\/sitemap/i, '') || '/');
+          }
         }}
       />
 
