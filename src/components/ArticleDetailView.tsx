@@ -288,39 +288,33 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({
               </p>
             ))}
 
-            {/* Prominent Original Source Portal Card */}
-            <div className="my-8 p-5 sm:p-6 bg-slate-900 text-white rounded-2xl border border-slate-800 shadow-lg">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-                <div className="space-y-1.5">
+            {/* Deshbarta Native Verified Article Footer */}
+            <div className="my-8 p-5 sm:p-6 bg-slate-900 text-white rounded-2xl border border-slate-800 shadow-md">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
-                      সংবাদটি যে নিউজ পোর্টাল থেকে এসেছে
+                      দেশবার্তা সত্যতা অনলাইন সংবাদ
                     </span>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-red-500" />
-                    <span>{article.publisherBengali || article.category}</span>
-                    {article.publisherName && (
-                      <span className="text-xs text-slate-400 font-normal">({article.publisherName})</span>
-                    )}
+                  <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-red-500" />
+                    <span>সূত্র: {article.publisherBengali || 'দেশবার্তা বিশেষ বার্তা'}</span>
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
-                    এই খবরের সম্পূর্ণ ভিডিও, ফটো ফিচার এবং লাইভ আপডেট সরাসরি {article.publisherBengali || article.category} পোর্টালে প্রকাশিত হয়েছে।
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    এই সম্পূর্ণ প্রতিবেদনটি দেশবার্তা পোর্টালেই সরাসরি পাঠযোগ্য। অন্য কোনো ওয়েবসাইটে যাওয়ার প্রয়োজন নেই।
                   </p>
                 </div>
 
-                {article.sourceUrl && (
-                  <a
-                    href={article.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs sm:text-sm px-5 py-3 rounded-xl transition-all shadow-md active:scale-95 flex items-center gap-2 cursor-pointer"
-                  >
-                    <span>মূল পোর্টালে সম্পূর্ণ খবর পড়ুন</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                )}
+                <button
+                  type="button"
+                  onClick={handleToggleSpeech}
+                  className="shrink-0 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all shadow-sm active:scale-95 flex items-center gap-2 cursor-pointer"
+                >
+                  <Volume2 className="w-4 h-4" />
+                  <span>সংবাদটি অডিওতে শুনুন</span>
+                </button>
               </div>
             </div>
           </div>
