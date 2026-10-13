@@ -64,7 +64,8 @@ export default function App() {
     let syncTimeStr = new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
 
     try {
-      const res = await fetch(`/api/news/live?t=${Date.now()}`, {
+      const forceParam = isBackgroundAuto ? '' : '&force=true';
+      const res = await fetch(`/api/news/live?t=${Date.now()}${forceParam}`, {
         cache: 'no-store',
         signal: AbortSignal.timeout(8000)
       });
@@ -102,7 +103,7 @@ export default function App() {
     let syncTimeStr = new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
 
     try {
-      const res = await fetch(`/api/news/sync?t=${Date.now()}`, {
+      const res = await fetch(`/api/news/sync?t=${Date.now()}&force=true`, {
         method: 'POST',
         cache: 'no-store',
         signal: AbortSignal.timeout(8000)

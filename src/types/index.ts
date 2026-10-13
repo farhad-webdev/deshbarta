@@ -27,6 +27,7 @@ export interface Article {
   publisherColor?: string;
   sourceUrl?: string;
   isLiveSynced?: boolean;
+  pubTimestamp?: number;
 }
 
 export interface Comment {

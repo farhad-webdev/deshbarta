@@ -231,20 +231,62 @@ function categorizeArticle(title: string, excerpt: string, itemCategories: strin
   return { categorySlug: 'national', category: 'সারাদেশ', categoryColor: '#0284c7' };
 }
 
+function formatBengaliTimeAgo(pubTimeMs: number): string {
+  if (!pubTimeMs || isNaN(pubTimeMs)) return 'আজকের সংবাদের লাইভ সিঙ্ক';
+  const diffMs = Date.now() - pubTimeMs;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  if (diffMins <= 2) return 'এইমাত্র প্রকাশ';
+  if (diffMins < 60) return `${diffMins} মিনিট আগে`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} ঘণ্টা আগে`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays} দিন আগে`;
+}
+
 function formatImageResolution(url: string): string {
-  if (!url) return '';
-  // BBC ichef image width upgrade to 800px HD
-  if (url.includes('ichef.bbci.co.uk')) {
-    return url
-      .replace(/\/ws\/\d+\//, '/ws/800/')
-      .replace(/\/w\/\d+\//, '/w/800/')
-      .replace(/\/standard\/\d+\//, '/standard/800/');
+  if (!url || typeof url !== 'string') return '';
+  let upgraded = url.trim();
+
+  // 1. Google News / Google User Content low-res thumbnails (=w100-h100, =s150, =w200, etc.)
+  if (upgraded.includes('googleusercontent.com') || upgraded.includes('gstatic.com') || upgraded.includes('news.google.com')) {
+    upgraded = upgraded
+      .replace(/=w\d+-h\d+(-p)?/gi, '=w1200-h800')
+      .replace(/=s\d+/gi, '=s1200')
+      .replace(/=w\d+/gi, '=w1200')
+      .replace(/=h\d+/gi, '=h800');
   }
-  // Prothom Alo image width upgrade
-  if (url.includes('media.prothomalo.com')) {
-    return url.replace(/\?w=\d+/, '?w=1200');
+
+  // 2. BBC ichef image resolution upgrade
+  if (upgraded.includes('ichef.bbci.co.uk')) {
+    upgraded = upgraded
+      .replace(/\/ws\/\d+\//gi, '/ws/1200/')
+      .replace(/\/w\/\d+\//gi, '/w/1200/')
+      .replace(/\/standard\/\d+\//gi, '/standard/1200/');
   }
-  return url;
+
+  // 3. Prothom Alo image CDN resolution upgrade
+  if (upgraded.includes('media.prothomalo.com')) {
+    upgraded = upgraded
+      .replace(/([?&])w=\d+/gi, '$1w=1200')
+      .replace(/([?&])width=\d+/gi, '$1width=1200');
+  }
+
+  // 4. Kaler Kantho, Kalbela, BDNews24, Jugantor, Ittefaq width upgrade
+  if (upgraded.includes('kalerkantho.com') || upgraded.includes('kalbela.com') || upgraded.includes('bdnews24.com') || upgraded.includes('jugantor.com')) {
+    upgraded = upgraded
+      .replace(/([?&])w=\d+/gi, '$1w=1200')
+      .replace(/([?&])width=\d+/gi, '$1width=1200')
+      .replace(/([?&])height=\d+/gi, '$1height=800');
+  }
+
+  // 5. Unsplash image resolution upgrade
+  if (upgraded.includes('images.unsplash.com')) {
+    upgraded = upgraded
+      .replace(/w=\d+/gi, 'w=1600')
+      .replace(/q=\d+/gi, 'q=90');
+  }
+
+  return upgraded;
 }
 
 // Helper to extract image URL from HTML content, enclosures, media tags, or JSON
@@ -374,7 +416,7 @@ async function scrapeFullArticle(url: string): Promise<string[]> {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'bn-BD,bn;q=0.9,en-US;q=0.8,en;q=0.7'
       },
-      signal: AbortSignal.timeout(1800)
+      signal: AbortSignal.timeout(5000)
     });
     if (!res.ok) return [];
     const html = await res.text();
@@ -428,7 +470,7 @@ async function fetchFeedWithFallback(source: SourceConfig): Promise<any[]> {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Accept': 'application/rss+xml, application/xml, text/xml, */*'
         },
-        signal: AbortSignal.timeout(2500)
+        signal: AbortSignal.timeout(4000)
       });
       if (!response.ok) return null;
       const xmlText = await response.text();
@@ -451,7 +493,7 @@ async function fetchFeedWithFallback(source: SourceConfig): Promise<any[]> {
     return [];
   }
 
-  const articlePromises = parsed.items.slice(0, 8).map(async (item: any, index: number) => {
+  const articlePromises = parsed.items.slice(0, 10).map(async (item: any, index: number) => {
     let rawTitle = cleanText(item.title || `${source.bengaliName} সংবাদ`);
     let cleanTitle = rawTitle
       .replace(new RegExp(`\\s*[-|]\\s*${source.bengaliName}.*`, 'i'), '')
@@ -463,18 +505,23 @@ async function fetchFeedWithFallback(source: SourceConfig): Promise<any[]> {
     const paragraphs = await getFullArticleContent(item, source, cleanTitle);
     const cleanParagraphs = paragraphs.map(p => cleanText(p)).filter(p => p.length > 0);
     const rawExcerpt = cleanText(cleanParagraphs[0] || cleanTitle);
-    const image = extractImageUrl(item, source, index);
-    const publishedDate = item.pubDate ? new Date(item.pubDate).toLocaleDateString('bn-BD', {
+    const pubTimeMs = item.pubDate && !isNaN(new Date(item.pubDate).getTime())
+      ? new Date(item.pubDate).getTime()
+      : Date.now() - index * 60000;
+    const publishedDate = new Date(pubTimeMs).toLocaleDateString('bn-BD', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
-    }) : 'আজকের সংবাদের লাইভ সিঙ্ক';
+    });
+    const timeAgoStr = formatBengaliTimeAgo(pubTimeMs);
 
+    const image = extractImageUrl(item, source, index);
     const itemCats = item.categories || [];
     const catInfo = categorizeArticle(cleanTitle, rawExcerpt, itemCats, source);
 
     return {
       id: `live-${source.id}-${index}-${Date.now()}`,
+      pubTimestamp: pubTimeMs,
       category: catInfo.category,
       categorySlug: catInfo.categorySlug,
       categoryColor: catInfo.categoryColor,
@@ -489,7 +536,7 @@ async function fetchFeedWithFallback(source: SourceConfig): Promise<any[]> {
       imageCaption: `ছবি: ${source.bengaliName} অনলাইন সংবাদ আলোকচিত্র`,
       author: `${source.bengaliName} অনলাইন`,
       publishedAt: publishedDate,
-      timeAgo: 'লাইভ সিঙ্কড',
+      timeAgo: timeAgoStr,
       views: `${Math.floor(15 + Math.random() * 50)}.${Math.floor(1 + Math.random() * 9)} হাজার পঠিত`,
       commentsCount: Math.floor(Math.random() * 25),
       readTime: `${Math.max(2, Math.ceil(paragraphs.join(' ').length / 300))} মিনিট পাঠ`,
@@ -514,6 +561,8 @@ async function fetchLiveNews() {
   });
 
   if (allLiveArticles.length > 0) {
+    // Sort articles by publication timestamp descending (newest first)
+    allLiveArticles.sort((a, b) => (b.pubTimestamp || 0) - (a.pubTimestamp || 0));
     cachedArticles = allLiveArticles;
     lastSyncTime = Date.now();
   }
@@ -526,7 +575,8 @@ app.get('/api/news/sources', (req, res) => {
 });
 
 app.get('/api/news/live', async (req, res) => {
-  if (!cachedArticles.length || Date.now() - lastSyncTime > 180000) {
+  const isForce = req.query.force === 'true';
+  if (isForce || !cachedArticles.length || Date.now() - lastSyncTime > 15000) {
     await fetchLiveNews();
   }
   res.json({

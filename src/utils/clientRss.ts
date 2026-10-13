@@ -12,20 +12,20 @@ interface RssSource {
 
 const RSS_FEEDS: RssSource[] = [
   {
-    publisher: 'প্রথম আলো',
-    publisherName: 'prothomalo',
-    color: '#0284c7',
-    category: 'জাতীয়',
-    feedUrl: 'https://www.prothomalo.com/feed',
-    defaultImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
     publisher: 'বিবিসি বাংলা',
     publisherName: 'bbcbangla',
     color: '#bb1919',
     category: 'আন্তর্জাতিক',
     feedUrl: 'https://feeds.bbci.co.uk/bengali/rss.xml',
     defaultImage: 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    publisher: 'প্রথম আলো',
+    publisherName: 'prothomalo',
+    color: '#0284c7',
+    category: 'জাতীয়',
+    feedUrl: 'https://www.prothomalo.com/feed',
+    defaultImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1200&q=80',
   },
   {
     publisher: 'বিডিনিউজ২৪',
@@ -66,6 +66,22 @@ const RSS_FEEDS: RssSource[] = [
     category: 'রাজনীতি',
     feedUrl: 'https://news.google.com/rss/search?q=site:jugantor.com&hl=bn&gl=BD&ceid=BD:bn',
     defaultImage: 'https://images.unsplash.com/photo-1526470608268-f674ce90ebd4?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    publisher: 'খেলাধুলা স্পেশাল',
+    publisherName: 'sports',
+    color: '#16a34a',
+    category: 'খেলাধুলা',
+    feedUrl: 'https://news.google.com/rss/search?q=site:prothomalo.com+OR+site:kalerkantho.com+%E0%A6%96%E0%A7%87%E0%A6%B2%E0%A6%BE%E0%A6%A0%E0%A7%81%E0%A6%B2%E0%A6%BE&hl=bn&gl=BD&ceid=BD:bn',
+    defaultImage: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    publisher: 'প্রযুক্তি খবর',
+    publisherName: 'tech',
+    color: '#7c3aed',
+    category: 'প্রযুক্তি',
+    feedUrl: 'https://news.google.com/rss/search?q=site:prothomalo.com+OR+site:kalbela.com+%E0%A6%AA%E0%A7%8D%E0%A6%B0%E0%A6%AF%E0%A7%81%E0%A6%95%E0%A7%8D%E0%A6%A4%E0%A6%BF&hl=bn&gl=BD&ceid=BD:bn',
+    defaultImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
   },
 ];
 
@@ -119,6 +135,59 @@ function extractAllParagraphsFromRssItem(item: any, rawTitle: string, sourcePubl
   return buildRichClientParagraphs(rawTitle, cleanText(rawContent), sourcePublisher);
 }
 
+function formatBengaliTimeAgo(pubTimeMs: number): string {
+  if (!pubTimeMs || isNaN(pubTimeMs)) return 'আজকের সংবাদের লাইভ সিঙ্ক';
+  const diffMs = Date.now() - pubTimeMs;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  if (diffMins <= 2) return 'এইমাত্র প্রকাশ';
+  if (diffMins < 60) return `${diffMins} মিনিট আগে`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} ঘণ্টা আগে`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays} দিন আগে`;
+}
+
+function formatImageResolution(url: string): string {
+  if (!url || typeof url !== 'string') return '';
+  let upgraded = url.trim();
+
+  if (upgraded.includes('googleusercontent.com') || upgraded.includes('gstatic.com') || upgraded.includes('news.google.com')) {
+    upgraded = upgraded
+      .replace(/=w\d+-h\d+(-p)?/gi, '=w1200-h800')
+      .replace(/=s\d+/gi, '=s1200')
+      .replace(/=w\d+/gi, '=w1200')
+      .replace(/=h\d+/gi, '=h800');
+  }
+
+  if (upgraded.includes('ichef.bbci.co.uk')) {
+    upgraded = upgraded
+      .replace(/\/ws\/\d+\//gi, '/ws/1200/')
+      .replace(/\/w\/\d+\//gi, '/w/1200/')
+      .replace(/\/standard\/\d+\//gi, '/standard/1200/');
+  }
+
+  if (upgraded.includes('media.prothomalo.com')) {
+    upgraded = upgraded
+      .replace(/([?&])w=\d+/gi, '$1w=1200')
+      .replace(/([?&])width=\d+/gi, '$1width=1200');
+  }
+
+  if (upgraded.includes('kalerkantho.com') || upgraded.includes('kalbela.com') || upgraded.includes('bdnews24.com') || upgraded.includes('jugantor.com')) {
+    upgraded = upgraded
+      .replace(/([?&])w=\d+/gi, '$1w=1200')
+      .replace(/([?&])width=\d+/gi, '$1width=1200')
+      .replace(/([?&])height=\d+/gi, '$1height=800');
+  }
+
+  if (upgraded.includes('images.unsplash.com')) {
+    upgraded = upgraded
+      .replace(/w=\d+/gi, 'w=1600')
+      .replace(/q=\d+/gi, 'q=90');
+  }
+
+  return upgraded;
+}
+
 // 1. Primary Method: Fetch via rss2json API
 async function fetchViaRss2Json(source: RssSource): Promise<Article[]> {
   try {
@@ -143,26 +212,33 @@ async function fetchViaRss2Json(source: RssSource): Promise<Article[]> {
       if (!imgUrl || imgUrl.includes('placeholder')) {
         imgUrl = DYNAMIC_IMAGES[index % DYNAMIC_IMAGES.length];
       }
+      imgUrl = formatImageResolution(imgUrl);
+
+      const pubTimeMs = item.pubDate && !isNaN(new Date(item.pubDate).getTime())
+        ? new Date(item.pubDate).getTime()
+        : Date.now() - index * 60000;
+      const timeAgoStr = formatBengaliTimeAgo(pubTimeMs);
 
       const link = item.link || item.guid || '';
       const richParagraphs = extractAllParagraphsFromRssItem(item, rawTitle, source.publisher);
 
       return {
         id: `rss2json-${source.publisherName}-${index}-${Date.now()}`,
+        pubTimestamp: pubTimeMs,
         title: rawTitle,
         excerpt: rawDesc.slice(0, 180) || `${rawTitle} সম্পর্কিত বিস্তারিত খবর।`,
         content: richParagraphs,
         category: source.category,
         categorySlug: source.category === 'আন্তর্জাতিক' ? 'international' : source.category === 'রাজনীতি' ? 'politics' : source.category === 'অর্থনীতি' ? 'economy' : 'national',
         author: `${source.publisher} বিশেষ প্রতিনিধি`,
-        timeAgo: 'লাইভ আপডেট',
+        timeAgo: timeAgoStr,
         views: `${Math.floor(Math.random() * 500) + 150} বার পড়া হয়েছে`,
         image: imgUrl,
         publisherName: source.publisherName,
         publisherBengali: source.publisher,
         publisherColor: source.color,
         isLiveSynced: true,
-        isLead: index === 0 && source.publisherName === 'prothomalo',
+        isLead: index === 0 && (source.publisherName === 'bbcbangla' || source.publisherName === 'prothomalo'),
         isTrending: index < 4,
         tags: [source.publisher, source.category, 'লাইভ সংবাদ'],
         sourceUrl: link,
@@ -229,24 +305,33 @@ function parseRssXml(xmlStr: string, source: RssSource): Article[] {
         }
       }
 
+      imgUrl = formatImageResolution(imgUrl);
+
+      const pubDateStr = item.querySelector('pubDate')?.textContent || item.querySelector('dc\\:date')?.textContent || '';
+      const pubTimeMs = pubDateStr && !isNaN(new Date(pubDateStr).getTime())
+        ? new Date(pubDateStr).getTime()
+        : Date.now() - index * 60000;
+      const timeAgoStr = formatBengaliTimeAgo(pubTimeMs);
+
       const richParagraphs = buildRichClientParagraphs(rawTitle, rawDesc, source.publisher);
 
       articles.push({
         id: `xmlproxy-${source.publisherName}-${index}-${Date.now()}`,
+        pubTimestamp: pubTimeMs,
         title: rawTitle,
         excerpt: rawDesc.slice(0, 180) || `${rawTitle} সম্পর্কিত খবর।`,
         content: richParagraphs,
         category: source.category,
         categorySlug: source.category === 'আন্তর্জাতিক' ? 'international' : source.category === 'রাজনীতি' ? 'politics' : 'national',
         author: `${source.publisher} ডেস্ক`,
-        timeAgo: 'লাইভ আপডেট',
+        timeAgo: timeAgoStr,
         views: `${Math.floor(Math.random() * 600) + 200} বার পড়া হয়েছে`,
         image: imgUrl,
         publisherName: source.publisherName,
         publisherBengali: source.publisher,
         publisherColor: source.color,
         isLiveSynced: true,
-        isLead: index === 0 && source.publisherName === 'prothomalo',
+        isLead: index === 0 && (source.publisherName === 'bbcbangla' || source.publisherName === 'prothomalo'),
         isTrending: index < 3,
         tags: [source.publisher, source.category, 'লাইভ খবর'],
         sourceUrl: link,
@@ -280,6 +365,9 @@ export async function fetchClientLiveNews(): Promise<Article[]> {
         allArticles.push(...res.value);
       }
     });
+
+    // Sort by pubTimestamp descending (newest first)
+    allArticles.sort((a, b) => ((b as any).pubTimestamp || 0) - ((a as any).pubTimestamp || 0));
 
     return allArticles;
   } catch (err) {
