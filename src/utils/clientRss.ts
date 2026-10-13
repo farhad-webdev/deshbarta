@@ -69,7 +69,7 @@ function parseRssXml(xmlStr: string, source: typeof RSS_FEEDS[0]): Article[] {
   try {
     const parser = new DOMParser();
     const doc = parser.parseFromString(xmlStr, 'text/xml');
-    const items = Array.from(doc.querySelectorAll('item')).slice(0, 5);
+    const items = Array.from(doc.querySelectorAll('item')).slice(0, 15);
 
     items.forEach((item, index) => {
       const rawTitle = item.querySelector('title')?.textContent || '';
