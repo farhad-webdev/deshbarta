@@ -347,7 +347,7 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({
             <div className="flex items-center gap-2 pb-3 mb-6 border-b border-slate-100">
               <MessageSquare className="w-5 h-5 text-red-600" />
               <h3 className="font-bold text-lg text-slate-900">
-                পাঠক মন্তব্য ({articleComments.length + article.commentsCount})
+                পাঠক মন্তব্য ({articleComments.length + (article.commentsCount || 0)})
               </h3>
             </div>
 

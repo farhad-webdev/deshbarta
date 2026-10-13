@@ -438,7 +438,7 @@ async function fetchFeedWithFallback(source: SourceConfig): Promise<any[]> {
     return [];
   }
 
-  const articlePromises = parsed.items.slice(0, 15).map(async (item: any, index: number) => {
+  const articlePromises = parsed.items.slice(0, 8).map(async (item: any, index: number) => {
     let rawTitle = cleanText(item.title || `${source.bengaliName} সংবাদ`);
     let cleanTitle = rawTitle
       .replace(new RegExp(`\\s*[-|]\\s*${source.bengaliName}.*`, 'i'), '')
@@ -636,7 +636,7 @@ app.post('/api/ai/ask', async (req, res) => {
 });
 
 async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -655,4 +655,8 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;

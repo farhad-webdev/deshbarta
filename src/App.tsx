@@ -16,6 +16,7 @@ import { PrayerTimesModal } from './components/PrayerTimesModal';
 import { INITIAL_ARTICLES, INITIAL_POLL, INITIAL_COMMENTS } from './data/mockNews';
 import { Article, Poll, Comment } from './types';
 import { cleanText } from './utils/textUtils';
+import { fetchClientLiveNews } from './utils/clientRss';
 
 const sanitizeArticle = (a: Article): Article => ({
   ...a,
@@ -56,58 +57,87 @@ export default function App() {
   const [aiInitialPrompt, setAiInitialPrompt] = useState<string | undefined>();
   const [isPlayingAudioBulletin, setIsPlayingAudioBulletin] = useState(false);
 
-  // Load live news from Express backend RSS aggregator
+  // Load live news with server endpoint + client-side RSS fallback for Vercel/Static hosting
   const fetchLiveNews = async (isBackgroundAuto = false) => {
     if (!isBackgroundAuto) setIsAutoSyncing(true);
+    let fetchedList: Article[] = [];
+    let syncTimeStr = new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+
     try {
-      const res = await fetch('/api/news/live');
+      const res = await fetch('/api/news/live', { signal: AbortSignal.timeout(3500) });
       if (res.ok) {
         const data = await res.json();
         if (data.articles && data.articles.length > 0) {
-          const sanitizedArticles = data.articles.map(sanitizeArticle);
-          setArticles((prev) => {
-            const existingIds = new Set(prev.map((a) => a.id));
-            const newFetched = sanitizedArticles.filter((a: Article) => !existingIds.has(a.id));
-            if (newFetched.length > 0 && isBackgroundAuto) {
-              setNewArticlesCount(newFetched.length);
-              setTimeout(() => setNewArticlesCount(0), 8000);
-            }
-            const staticArticles = prev.filter((a) => !a.isLiveSynced);
-            return [...sanitizedArticles, ...staticArticles];
-          });
-          setLiveCount(sanitizedArticles.length);
-          if (data.syncTime) setLastSyncTime(data.syncTime);
+          fetchedList = data.articles.map(sanitizeArticle);
+          if (data.syncTime) syncTimeStr = data.syncTime;
         }
       }
     } catch (err) {
-      console.warn('Automated news feed fetch error:', err);
-    } finally {
-      setIsAutoSyncing(false);
+      console.warn('Server API fetch failed/timed out, attempting client RSS fallback:', err);
     }
+
+    // Client-side fallback if server fetch yielded no articles (e.g. Vercel static deployment)
+    if (fetchedList.length === 0) {
+      const clientArticles = await fetchClientLiveNews();
+      if (clientArticles.length > 0) {
+        fetchedList = clientArticles.map(sanitizeArticle);
+      }
+    }
+
+    if (fetchedList.length > 0) {
+      setArticles((prev) => {
+        const existingIds = new Set(prev.map((a) => a.id));
+        const newFetched = fetchedList.filter((a: Article) => !existingIds.has(a.id));
+        if (newFetched.length > 0 && isBackgroundAuto) {
+          setNewArticlesCount(newFetched.length);
+          setTimeout(() => setNewArticlesCount(0), 8000);
+        }
+        const staticArticles = prev.filter((a) => !a.isLiveSynced);
+        return [...fetchedList, ...staticArticles];
+      });
+      setLiveCount(fetchedList.length);
+      setLastSyncTime(syncTimeStr);
+    }
+
+    setIsAutoSyncing(false);
   };
 
   const handleManualSync = async () => {
     setIsAutoSyncing(true);
+    let fetchedList: Article[] = [];
+    let syncTimeStr = new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+
     try {
-      const res = await fetch('/api/news/sync', { method: 'POST' });
+      const res = await fetch('/api/news/sync', { method: 'POST', signal: AbortSignal.timeout(3500) });
       if (res.ok) {
         const data = await res.json();
         if (data.articles && data.articles.length > 0) {
-          const sanitizedArticles = data.articles.map(sanitizeArticle);
-          setArticles((prev) => {
-            const staticArticles = prev.filter((a) => !a.isLiveSynced);
-            return [...sanitizedArticles, ...staticArticles];
-          });
-          setLiveCount(sanitizedArticles.length);
-          if (data.syncTime) setLastSyncTime(data.syncTime);
+          fetchedList = data.articles.map(sanitizeArticle);
+          if (data.syncTime) syncTimeStr = data.syncTime;
         }
       }
     } catch (err) {
-      console.warn('Manual news sync error:', err);
-    } finally {
-      setIsAutoSyncing(false);
-      setCountdownSeconds(20);
+      console.warn('Server sync failed, falling back to client RSS fetch:', err);
     }
+
+    if (fetchedList.length === 0) {
+      const clientArticles = await fetchClientLiveNews();
+      if (clientArticles.length > 0) {
+        fetchedList = clientArticles.map(sanitizeArticle);
+      }
+    }
+
+    if (fetchedList.length > 0) {
+      setArticles((prev) => {
+        const staticArticles = prev.filter((a) => !a.isLiveSynced);
+        return [...fetchedList, ...staticArticles];
+      });
+      setLiveCount(fetchedList.length);
+      setLastSyncTime(syncTimeStr);
+    }
+
+    setIsAutoSyncing(false);
+    setCountdownSeconds(20);
   };
 
   // Initial live news load

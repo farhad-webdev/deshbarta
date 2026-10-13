@@ -2,17 +2,17 @@ export interface Article {
   id: string;
   category: string;
   categorySlug: string;
-  categoryColor: string;
+  categoryColor?: string;
   title: string;
   excerpt: string;
   content: string[];
   image: string;
   imageCaption?: string;
   author: string;
-  publishedAt: string;
+  publishedAt?: string;
   timeAgo: string;
   views?: string;
-  commentsCount: number;
+  commentsCount?: number;
   tags: string[];
   isBreaking?: boolean;
   isLead?: boolean;
@@ -20,10 +20,11 @@ export interface Article {
   trendingRank?: number;
   isMostRead?: boolean;
   mostReadRank?: number;
-  readTime: string;
+  readTime?: string;
   audioDuration?: string;
   publisherName?: string;
   publisherBengali?: string;
+  publisherColor?: string;
   sourceUrl?: string;
   isLiveSynced?: boolean;
 }
