@@ -69,7 +69,15 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         },
         body: JSON.stringify({
           question: text.trim(),
-          articles: articles.length > 0 ? articles.slice(0, 30) : undefined
+          articles: articles.length > 0 ? articles.slice(0, 30).map((a) => ({
+            id: a.id,
+            title: a.title,
+            excerpt: a.excerpt,
+            category: a.category,
+            publisherBengali: a.publisherBengali || a.publisherName,
+            publishedAt: a.publishedAt || a.timeAgo,
+            content: Array.isArray(a.content) ? a.content.slice(0, 3).join(' ') : (a.content || a.excerpt || '')
+          })) : undefined
         })
       });
 

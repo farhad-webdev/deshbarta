@@ -37,7 +37,17 @@ const parser = new Parser({
   timeout: 8000,
 });
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Disable caching globally for all API responses (Fixes Vercel CDN cache issues)
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+  next();
+});
 
 interface SourceConfig {
   id: string;
@@ -364,7 +374,7 @@ async function scrapeFullArticle(url: string): Promise<string[]> {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'bn-BD,bn;q=0.9,en-US;q=0.8,en;q=0.7'
       },
-      signal: AbortSignal.timeout(4500)
+      signal: AbortSignal.timeout(1800)
     });
     if (!res.ok) return [];
     const html = await res.text();
@@ -417,7 +427,8 @@ async function fetchFeedWithFallback(source: SourceConfig): Promise<any[]> {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Accept': 'application/rss+xml, application/xml, text/xml, */*'
-        }
+        },
+        signal: AbortSignal.timeout(2500)
       });
       if (!response.ok) return null;
       const xmlText = await response.text();
@@ -491,21 +502,21 @@ async function fetchFeedWithFallback(source: SourceConfig): Promise<any[]> {
 }
 
 async function fetchLiveNews() {
+  const results = await Promise.allSettled(
+    NEWS_SOURCES.map(source => fetchFeedWithFallback(source))
+  );
+
   const allLiveArticles: any[] = [];
-
-  for (const source of NEWS_SOURCES) {
-    try {
-      const sourceArticles = await fetchFeedWithFallback(source);
-      if (sourceArticles.length > 0) {
-        allLiveArticles.push(...sourceArticles);
-      }
-    } catch {
-      // Quiet catch
+  results.forEach(res => {
+    if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+      allLiveArticles.push(...res.value);
     }
-  }
+  });
 
-  cachedArticles = allLiveArticles;
-  lastSyncTime = Date.now();
+  if (allLiveArticles.length > 0) {
+    cachedArticles = allLiveArticles;
+    lastSyncTime = Date.now();
+  }
   return cachedArticles;
 }
 
@@ -537,6 +548,17 @@ app.post('/api/news/sync', async (req, res) => {
     count: articles.length,
     articles,
   });
+});
+
+app.get('/api/news/scrape', async (req, res) => {
+  const url = req.query.url as string;
+  if (!url) return res.status(400).json({ error: 'URL parameter required' });
+  try {
+    const paragraphs = await scrapeFullArticle(url);
+    res.json({ status: 'success', paragraphs });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Scraping failed' });
+  }
 });
 
 // Deshbarta AI News Assistant Research API

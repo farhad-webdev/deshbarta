@@ -68,7 +68,9 @@ service cloud.firestore {
 
       // User Bookmarks Subcollection
       match /bookmarks/{bookmarkId} {
-        allow read, write: if isValidId(userId) && isValidId(bookmarkId) && isOwner(userId);
+        allow read: if isOwner(userId);
+        allow create, update: if isValidId(userId) && isValidId(bookmarkId) && isOwner(userId);
+        allow delete: if isValidId(userId) && isValidId(bookmarkId) && isOwner(userId);
       }
     }
 
