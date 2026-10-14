@@ -56,7 +56,7 @@ const RSS_FEEDS: RssSource[] = [
     publisherName: 'ittefaq',
     color: '#15803d',
     category: 'জাতীয়',
-    feedUrl: 'https://news.google.com/rss/search?q=site:ittefaq.com.bd&hl=bn&gl=BD&ceid=BD:bn',
+    feedUrl: 'https://www.ittefaq.com.bd/feed',
     defaultImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1200&q=80',
   },
   {
@@ -64,7 +64,7 @@ const RSS_FEEDS: RssSource[] = [
     publisherName: 'jugantor',
     color: '#b91c1c',
     category: 'রাজনীতি',
-    feedUrl: 'https://news.google.com/rss/search?q=site:jugantor.com&hl=bn&gl=BD&ceid=BD:bn',
+    feedUrl: 'https://www.jugantor.com/feed',
     defaultImage: 'https://images.unsplash.com/photo-1526470608268-f674ce90ebd4?auto=format&fit=crop&w=1200&q=80',
   },
   {
@@ -85,17 +85,27 @@ const RSS_FEEDS: RssSource[] = [
   },
 ];
 
-const DYNAMIC_IMAGES = [
-  'https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80',
+const AUTHENTIC_NEWS_IMAGES = [
+  'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1200&q=80',
   'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1200&q=80',
   'https://images.unsplash.com/photo-1590059208019-15224887b38c?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80',
   'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80'
+  'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=1200&q=80'
 ];
+
+function getDiverseNewsImage(title: string, globalIdx: number): string {
+  let hash = 0;
+  for (let i = 0; i < (title || '').length; i++) {
+    hash = (hash * 37 + title.charCodeAt(i)) % AUTHENTIC_NEWS_IMAGES.length;
+  }
+  const combined = (hash + globalIdx) % AUTHENTIC_NEWS_IMAGES.length;
+  return AUTHENTIC_NEWS_IMAGES[combined];
+}
 
 function buildRichClientParagraphs(rawTitle: string, rawDesc: string, sourcePublisher: string): string[] {
   const cleanTitleStr = cleanText(rawTitle);
@@ -210,7 +220,7 @@ async function fetchViaRss2Json(source: RssSource): Promise<Article[]> {
 
       let imgUrl = item.thumbnail || item.enclosure?.link || source.defaultImage;
       if (!imgUrl || imgUrl.includes('placeholder')) {
-        imgUrl = DYNAMIC_IMAGES[index % DYNAMIC_IMAGES.length];
+        imgUrl = getDiverseNewsImage(rawTitle, index);
       }
       imgUrl = formatImageResolution(imgUrl);
 

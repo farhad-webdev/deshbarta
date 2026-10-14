@@ -252,7 +252,7 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-red-600 hover:bg-slate-100 transition-colors cursor-pointer shadow-2xs relative"
+                  className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-zinc-900 hover:bg-slate-100 transition-colors cursor-pointer shadow-2xs relative"
                   title="লিংক কপি করুন"
                 >
                   {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
@@ -299,7 +299,7 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({
                     </span>
                   </div>
                   <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-red-500" />
+                    <Globe className="w-4 h-4 text-zinc-300" />
                     <span>সূত্র: {article.publisherBengali || 'দেশবার্তা বিশেষ বার্তা'}</span>
                   </h3>
                   <p className="text-xs text-slate-300 leading-relaxed">
@@ -310,7 +310,7 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({
                 <button
                   type="button"
                   onClick={handleToggleSpeech}
-                  className="shrink-0 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all shadow-sm active:scale-95 flex items-center gap-2 cursor-pointer"
+                  className="shrink-0 bg-zinc-800 hover:bg-black text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all shadow-sm active:scale-95 flex items-center gap-2 cursor-pointer border border-zinc-700"
                 >
                   <Volume2 className="w-4 h-4" />
                   <span>সংবাদটি অডিওতে শুনুন</span>
@@ -325,7 +325,7 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({
                     href={article.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-red-400 hover:text-red-300 font-medium hover:underline inline-flex items-center gap-1 cursor-pointer"
+                    className="text-slate-300 hover:text-white font-medium hover:underline inline-flex items-center gap-1 cursor-pointer"
                   >
                     <span>(ঐচ্ছিক) মূল পোর্টাল ভিজিট করুন</span>
                     <ExternalLink className="w-3 h-3" />
@@ -344,7 +344,7 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({
               {article.tags.map((tag, i) => (
                 <span
                   key={i}
-                  className="px-3 py-1 bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-700 text-xs font-medium rounded-md transition-colors cursor-pointer"
+                  className="px-3 py-1 bg-slate-100 hover:bg-zinc-200 hover:text-zinc-900 text-slate-700 text-xs font-medium rounded-md transition-colors cursor-pointer"
                 >
                   #{tag}
                 </span>

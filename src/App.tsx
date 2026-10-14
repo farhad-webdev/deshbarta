@@ -17,6 +17,7 @@ import { WeatherModal } from './components/WeatherModal';
 import { PrayerTimesModal } from './components/PrayerTimesModal';
 import { InfoPageModal, InfoPageType } from './components/InfoPageModal';
 import { JobsPage } from './components/JobsPage';
+import { TendersPage } from './components/TendersPage';
 import { INITIAL_ARTICLES, INITIAL_POLL, INITIAL_COMMENTS } from './data/mockNews';
 import { Article, Poll, Comment } from './types';
 import { cleanText } from './utils/textUtils';
@@ -468,6 +469,18 @@ export default function App() {
             onOpenAIAssistant={handleOpenAIAssistant}
             poll={poll}
             onVotePoll={handleVotePoll}
+          />
+        ) : activeCategory === 'tender' ? (
+          <TendersPage
+            articles={articles}
+            onSelectArticle={(art) => {
+              setSelectedArticle(art);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onGoHome={() => {
+              setActiveCategory('all');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         ) : activeCategory === 'jobs' ? (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">

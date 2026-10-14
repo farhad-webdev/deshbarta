@@ -29,6 +29,8 @@ export const LiveAutomationBar: React.FC<LiveAutomationBarProps> = ({
     { id: 'bbcbangla', name: 'বিবিসি বাংলা', url: 'https://www.bbc.com/bengali', color: 'bg-[#bb1919] text-white' },
     { id: 'kalbela', name: 'কালবেলা', url: 'https://www.kalbela.com/', color: 'bg-[#ea580c] text-white' },
     { id: 'kalerkantho', name: 'কালের কণ্ঠ', url: 'https://www.kalerkantho.com/', color: 'bg-[#dc2626] text-white' },
+    { id: 'ittefaq', name: 'দৈনিক ইত্তেফাক', url: 'https://www.ittefaq.com.bd/', color: 'bg-[#15803d] text-white' },
+    { id: 'jugantor', name: 'দৈনিক যুগান্তর', url: 'https://www.jugantor.com/', color: 'bg-[#b91c1c] text-white' },
   ];
 
   return (
@@ -81,11 +83,6 @@ export const LiveAutomationBar: React.FC<LiveAutomationBarProps> = ({
             <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
             {totalLiveCount > 0 && <span>{totalLiveCount}টি খবর সিঙ্কড</span>}
             {lastSyncTime && <span className="text-slate-400">({lastSyncTime})</span>}
-            {typeof countdownSeconds === 'number' && (
-              <span className="text-amber-400 font-bold border-l border-slate-700 pl-2">
-                অটো রিফ্রেশ: {countdownSeconds}সে.
-              </span>
-            )}
           </div>
 
           {/* Premium Glowing Live Preloader vs Refresh Button */}

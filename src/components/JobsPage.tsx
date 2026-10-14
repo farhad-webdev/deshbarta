@@ -38,6 +38,7 @@ export interface JobCircular {
   deadlineDaysLeft?: number;
   publishedAt: string;
   applyUrl: string;
+  sourcePortalName?: string;
   excerpt: string;
   fullDetails: string[];
   articleRef?: Article;
@@ -612,6 +613,12 @@ export const JobsPage: React.FC<JobsPageProps> = ({
                     <span className="font-medium text-slate-800">আবেদনের শেষ সময়:</span>
                     <span className="font-semibold text-red-600">{job.deadline}</span>
                   </div>
+
+                  <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                    <Building2 className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                    <span className="font-medium text-slate-800">সংবাদ ও উৎস পোর্টাল:</span>
+                    <span className="font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded truncate">{job.sourcePortalName || job.organization}</span>
+                  </div>
                 </div>
               </div>
 
@@ -637,10 +644,10 @@ export const JobsPage: React.FC<JobsPageProps> = ({
                       href={job.applyUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded transition-colors shadow-xs"
-                      title="অফিসিয়াল আবেদন পোর্টালে যান"
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded transition-colors shadow-xs"
+                      title="মূল অফিসিয়াল ওয়েবসাইটে আবেদন করুন"
                     >
-                      <span>আবেদন লিংক</span>
+                      <span>অফিসিয়াল লিংক</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}

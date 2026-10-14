@@ -174,6 +174,7 @@ export const Header: React.FC<HeaderProps> = ({
   const navCategories = [
     { id: 'all', label: 'সব খবর' },
     { id: 'jobs', label: 'চাকরি', isHot: true },
+    { id: 'tender', label: 'টেন্ডার' },
     { id: 'top', label: 'শীর্ষ সংবাদ' },
     { id: 'politics', label: 'রাজনীতি' },
     { id: 'economy', label: 'অর্থনীতি' },
